@@ -9,6 +9,10 @@
 
 🇭🇺 *A magyar leírás: [README.hu.md](README.hu.md)*
 
+![Gabci's Acoustic Cloak user interface](docs/images/acoustic-cloak-ui.png)
+
+*The phase radar showing the current bass-versus-kick relationship, with the live correlation and phase delta below it.*
+
 Sidechain compression solves the kick-versus-bass collision by turning the bass down. Acoustic Cloak
 solves it without a level change: for the duration of each kick transient it rotates the phase of the
 bass inside a narrow target band, so the bass steps out of the kick's way and steps back in when the
@@ -138,6 +142,29 @@ CHANGELOG.md     Development history, phase by phase
 
 - **macOS** (Intel, x86_64) — FL Studio 2026
 - **Windows 11 x64** — FL Studio 2026
+
+## Performance
+
+![FL Studio plug-in performance monitor](docs/images/performance-monitor.png)
+
+Measured in FL Studio 2026 on Windows 11 x64, on an ASUS ZenBook 13 with an Intel
+Core i7-1065G7 — a low-power four-core laptop CPU, not a workstation. All seven
+plug-ins ran simultaneously in the same project, with two stock Image-Line plug-ins
+included for reference. The figures are FL Studio's own, captured with
+*Reset on transport* enabled so that one-off initialisation spikes are excluded.
+
+| Plug-in | CPU % | Time | Peak |
+|---|---:|---:|---:|
+| Gabci's AeroDynamics Pro | 17 | 251 | 353 |
+| FLEX Bass *(Image-Line, reference)* | 9 | 125 | 275 |
+| Gabci's MasterClear | 4 | 53 | 264 |
+| Gabci's SmartMask Network *(instance 1)* | 3 | 43 | 554 |
+| Gabci's PhaseLock Sub | 3 | 41 | 1306 |
+| Emphasizer *(Image-Line, reference)* | 2 | 34 | 117 |
+| **Gabci's Acoustic Cloak** | **2** | **36** | **191** |
+| Gabci's MorphicPhaser | 2 | 27 | 152 |
+| Gabci's SmartMask Network *(instance 2)* | 1 | 16 | 498 |
+| Gabci's SpectralCarve Pro | 1 | 19 | 751 |
 
 ## Licence
 
