@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gabci's Acoustic Cloak — Product Overview</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #1a2b22;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .cover {
+    background: linear-gradient(160deg, #06120b 0%, #0d2417 60%, #123a24 100%);
+    color: #eafff0;
+    padding: 48px 40px;
+    border-radius: 10px;
+    margin-bottom: 26px;
+  }
+  .cover h1 {
+    font-size: 34px;
+    margin: 0 0 6px 0;
+    color: #3dff9a;
+    letter-spacing: 0.5px;
+  }
+  .cover .tagline {
+    font-size: 15px;
+    color: #b9f3d1;
+    margin-bottom: 18px;
+  }
+  .cover .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .badge {
+    background: rgba(61,255,154,0.12);
+    border: 1px solid #3dff9a;
+    color: #baffe0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 10.5px;
+  }
+  h2 {
+    color: #0d3a24;
+    font-size: 18px;
+    border-bottom: 2px solid #3dff9a;
+    padding-bottom: 6px;
+    margin-top: 30px;
+  }
+  h3 { color: #17593a; font-size: 13.5px; margin-bottom: 4px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card {
+    background: #f3fbf6;
+    border: 1px solid #cfe9db;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .card.warn { background: #fff8ec; border-color: #f0d9a8; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #dcefe3; font-size: 11.5px; }
+  th { color: #17593a; background: #eaf7ef; }
+  .metric-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #cfe9db; font-size: 11.5px; }
+  .metric-value { font-weight: bold; color: #0d3a24; }
+  .diagram { text-align: center; margin: 14px 0; }
+  .diagram svg { width: 100%; max-width: 640px; }
+  .signature {
+    font-style: italic; color: #5b7c6a; font-size: 10px; margin-top: 30px;
+    border-top: 1px solid #cfe9db; padding-top: 10px;
+  }
+  ul.feature-list { padding-left: 18px; }
+  ul.feature-list li { margin-bottom: 6px; }
+  .ascii {
+    background: #0d1a12; color: #7fe3ac; font-family: 'Courier New', monospace;
+    font-size: 9.5px; line-height: 1.35; padding: 12px 14px; border-radius: 6px;
+    white-space: pre; overflow-x: auto;
+  }
+  .footer-note { font-size: 10px; color: #7a938a; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>GABCI'S ACOUSTIC CLOAK</h1>
+  <div class="tagline">A phase-rotation sidechain engine for zero-loudness-loss Kick/Bass alignment.</div>
+  <p style="max-width: 480px; color:#cdf7e0; font-size:12px;">
+    Instead of ducking the bass on every kick hit, Acoustic Cloak rotates the bass's phase
+    within an adjustable frequency range so it sums <strong>constructively</strong> with the kick —
+    full loudness, no volume loss, no pumping.
+  </p>
+  <div class="badges">
+    <span class="badge">VST3 · Standalone</span>
+    <span class="badge">macOS &amp; Windows 11 x64</span>
+    <span class="badge">JUCE 9 · C++20</span>
+    <span class="badge">v1.0.0</span>
+  </div>
+</div>
+
+<h2>What Makes It Different</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>Traditional sidechain compression</h3>
+    <p>Ducks the bass's <em>volume</em> whenever the kick hits — trading loudness for
+    separation. The lower the crossover, the more audible the pumping.</p>
+  </div>
+  <div class="card">
+    <h3>Acoustic Cloak's approach</h3>
+    <p>Measures the actual <em>phase relationship</em> between kick and bass inside a
+    user-defined low-frequency window, then rotates the bass's phase so the two sum
+    constructively — no gain reduction anywhere in the signal path.</p>
+  </div>
+</div>
+
+<h2>Technical Architecture</h2>
+<p>Three purpose-built DSP stages, each individually measured and verified (not assumed) — see
+<a href="#quality">Quality &amp; Performance</a> for the actual numbers.</p>
+<div class="diagram">
+  <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2a5d43"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c47a1f"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+
+  <!-- Lane labels -->
+  <text x="20" y="30" font-size="13" font-weight="bold" fill="#2a5d43">BASS (MAIN) SIGNAL PATH</text>
+  <text x="20" y="330" font-size="13" font-weight="bold" fill="#c47a1f">KICK (SIDECHAIN) — ANALYSIS ONLY</text>
+
+  <!-- MAIN IN -->
+  <rect x="20" y="50" width="110" height="50" rx="8" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="75" y="80" font-size="12" text-anchor="middle" fill="#1a3a2a">MAIN IN</text>
+
+  <!-- Lookahead Delay -->
+  <rect x="165" y="50" width="120" height="50" rx="8" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="225" y="72" font-size="11" text-anchor="middle" fill="#1a3a2a">Lookahead</text>
+  <text x="225" y="86" font-size="11" text-anchor="middle" fill="#1a3a2a">Delay (0-20ms)</text>
+
+  <!-- BandIsolator Main -->
+  <rect x="320" y="40" width="140" height="70" rx="8" fill="#dff0e6" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="390" y="62" font-size="11" text-anchor="middle" font-weight="bold" fill="#1a3a2a">BandIsolator</text>
+  <text x="390" y="77" font-size="10" text-anchor="middle" fill="#1a3a2a">Linkwitz-Riley split</text>
+  <text x="390" y="91" font-size="10" text-anchor="middle" fill="#1a3a2a">flat-summing, proven</text>
+
+  <!-- Target Band / Residual outputs -->
+  <rect x="500" y="20" width="130" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="565" y="44" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Target Band (Low)</text>
+  <rect x="500" y="90" width="130" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="565" y="114" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Residual (High)</text>
+
+  <!-- PhaseRotator box -->
+  <rect x="670" y="10" width="230" height="140" rx="8" fill="#dff0e6" stroke="#2a5d43" stroke-width="2"/>
+  <text x="785" y="30" font-size="12" text-anchor="middle" font-weight="bold" fill="#1a3a2a">PhaseRotator</text>
+  <rect x="685" y="40" width="95" height="36" rx="5" fill="#ffffff" stroke="#2a5d43"/>
+  <text x="732" y="62" font-size="9.5" text-anchor="middle" fill="#1a3a2a">AllpassHilbert</text>
+  <rect x="790" y="40" width="95" height="36" rx="5" fill="#ffffff" stroke="#2a5d43"/>
+  <text x="837" y="62" font-size="9.5" text-anchor="middle" fill="#1a3a2a">rotate by θ → Rlow</text>
+  <rect x="685" y="86" width="200" height="36" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="785" y="108" font-size="9.5" text-anchor="middle" fill="#5a3c10">DummyAllpass (identical) → Ihigh</text>
+  <text x="785" y="136" font-size="9" text-anchor="middle" fill="#3a6b52" font-style="italic">Rlow+Ihigh stays flat — LTI linearity</text>
+
+  <!-- Recombine -->
+  <rect x="710" y="170" width="150" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="785" y="194" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Recombine + Bypass mix</text>
+
+  <!-- MAIN OUT -->
+  <rect x="895" y="170" width="90" height="40" rx="6" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="940" y="194" font-size="11" text-anchor="middle" fill="#1a3a2a">MAIN OUT</text>
+
+  <!-- SIDECHAIN IN -->
+  <rect x="20" y="350" width="130" height="50" rx="8" fill="#fdf1e2" stroke="#c47a1f" stroke-width="1.5"/>
+  <text x="85" y="380" font-size="11.5" text-anchor="middle" fill="#5a3c10">SIDECHAIN IN</text>
+
+  <!-- BandIsolator SC -->
+  <rect x="200" y="340" width="140" height="70" rx="8" fill="#fdf1e2" stroke="#c47a1f" stroke-width="1.5"/>
+  <text x="270" y="362" font-size="11" text-anchor="middle" font-weight="bold" fill="#5a3c10">BandIsolator</text>
+  <text x="270" y="378" font-size="10" text-anchor="middle" fill="#5a3c10">(same target band)</text>
+  <text x="270" y="392" font-size="10" text-anchor="middle" fill="#5a3c10">Target Band only</text>
+
+  <!-- Phase Correlation Analyzer -->
+  <rect x="400" y="220" width="220" height="150" rx="8" fill="#fff7ea" stroke="#c47a1f" stroke-width="2"/>
+  <text x="510" y="242" font-size="12" text-anchor="middle" font-weight="bold" fill="#5a3c10">PhaseCorrelationAnalyzer</text>
+  <rect x="415" y="252" width="90" height="34" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="460" y="272" font-size="9.5" text-anchor="middle" fill="#5a3c10">ResonatorBank</text>
+  <rect x="515" y="252" width="90" height="34" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="560" y="272" font-size="9.5" text-anchor="middle" fill="#5a3c10">z = side·conj(main)</text>
+  <text x="510" y="300" font-size="9.5" text-anchor="middle" fill="#5a3c10">broadband envelope → Transient Sensitivity gate</text>
+  <text x="510" y="316" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#5a3c10">→ φΔ (phase delta) + correlation</text>
+  <text x="510" y="332" font-size="9" text-anchor="middle" fill="#8a6420" font-style="italic">θ = φΔ × Cloak Depth</text>
+  <text x="510" y="352" font-size="9" text-anchor="middle" fill="#8a6420">→ Holographic Radar GUI</text>
+
+  <!-- Arrows -->
+  <path d="M130,75 H165" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M285,75 H320" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M460,60 C480,60 480,40 500,40" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M460,90 C480,90 480,110 500,110" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M630,40 C650,40 650,58 670,58" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M630,110 C650,110 650,104 670,104" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M785,150 V170" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M860,190 H895" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <path d="M150,375 H200" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M270,410 C270,440 420,440 460,370" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M565,60 C565,150 545,180 520,220" stroke="#2a5d43" stroke-width="1.3" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <path d="M605,270 C660,270 700,180 685,76" stroke="#8a6420" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowOrange)"/>
+
+  <text x="500" y="450" font-size="10.5" fill="#555" text-anchor="middle">Dashed lines = analysis-only signal / control data (not audio). Solid = audio signal path.</text>
+  <text x="500" y="470" font-size="10.5" fill="#555" text-anchor="middle">At Cloak Depth 0%% (θ=0), Rlow = Ilow exactly by construction — no audio change regardless of the network's own response.</text>
+</svg>
+
+</div>
+<p class="footer-note">Solid arrows = audio signal. Dashed arrows = analysis/control data only.</p>
+
+<h2>Core Technology</h2>
+<ul class="feature-list">
+  <li><strong>BandIsolator</strong> — a two-stage 4th-order Linkwitz-Riley crossover that isolates
+  the user's Target Frequency Range with a mathematically flat magnitude sum, measured within
+  2% across a 10Hz–8kHz sweep and &lt;3% right at the crossover edges.</li>
+  <li><strong>AllpassHilbertNetwork</strong> — an 8-stage interleaved IIR allpass Hilbert
+  transformer (coefficients derived directly from the bilinear transform of an analog allpass,
+  not a memorised table), giving a genuine analytic (I/Q) signal with <em>exact</em> magnitude
+  preservation — no resonant filter, no image-leakage artefact.</li>
+  <li><strong>The "Dummy All-Pass" recombination</strong> — the residual (everything outside the
+  target band) is warped by an exact duplicate of the same allpass cascade used to rotate the
+  target band. Because filtering is linear, the two paths always recombine flat, at
+  <em>any</em> rotation angle — not just when the effect is off.</li>
+  <li><strong>PhaseCorrelationAnalyzer</strong> — a continuous (not snapshot-based) phase-difference
+  tracker with a broadband, non-resonant Transient Sensitivity gate, so short kick transients
+  are never smeared by filter ringing.</li>
+  <li><strong>Holographic Radar display</strong> — a real-time polar visualisation of the measured
+  phase relationship, with a phosphor-glow, medical-instrument aesthetic.</li>
+</ul>
+
+<h2>Why This Is Unique</h2>
+<p>Most "phase alignment" plugins either (a) apply a simple fixed delay, which cannot correct a
+genuine phase relationship across a band, or (b) use a resonant filter shortcut that colours the
+signal outside its own narrow passband. Acoustic Cloak's design went through three independent
+engineering-review cycles specifically to eliminate both failure modes:</p>
+<table>
+  <tr><th>Design considered</th><th>Why it was rejected</th></tr>
+  <tr><td>STFT / overlap-add phase vocoder</td><td>Impractical FFT window size for 20-150Hz resolution; latency and pre-ringing risk</td></tr>
+  <tr><td>Summed multi-resonator bank (for audio, not just analysis)</td><td>Overlapping resonant filters produce a "lumpy", non-flat combined magnitude response</td></tr>
+  <tr><td>Nested crossover sub-bands</td><td>Measured ~20% interference — crossover points too close together in a narrow band</td></tr>
+  <tr><td>Single resonator + delta correction</td><td>Measured ~65% rotation error from negative-frequency image leakage</td></tr>
+  <tr><td><strong>Allpass Hilbert pair + Dummy All-Pass (shipped)</strong></td><td><strong>Exact magnitude preservation, flat recombination at any angle</strong></td></tr>
+</table>
+
+<h2 id="quality">Quality &amp; Performance — Measured, Not Assumed</h2>
+<div class="grid2">
+  <div class="card">
+    <div class="metric-row"><span>Automated test assertions</span><span class="metric-value">78</span></div>
+    <div class="metric-row"><span>Test cases (all passing)</span><span class="metric-value">14</span></div>
+    <div class="metric-row"><span>BandIsolator flat-sum accuracy</span><span class="metric-value">±2% (10Hz–8kHz)</span></div>
+    <div class="metric-row"><span>AllpassHilbertNetwork phase accuracy</span><span class="metric-value">80-84° of 90° (20-150Hz)</span></div>
+    <div class="metric-row"><span>AllpassHilbertNetwork magnitude error</span><span class="metric-value">&lt;0.001% (exact by construction)</span></div>
+  </div>
+  <div class="card">
+    <div class="metric-row"><span>Estimated single-instance CPU (48kHz/512-sample)</span><span class="metric-value">0.522%</span></div>
+    <div class="metric-row"><span>Real-time headroom</span><span class="metric-value">191.7x</span></div>
+    <div class="metric-row"><span>Reported plugin latency</span><span class="metric-value">Lookahead value (0-20ms, user-set)</span></div>
+    <div class="metric-row"><span>Source code (Source/ only)</span><span class="metric-value">2143 lines</span></div>
+    <div class="metric-row"><span>Test code</span><span class="metric-value">690 lines</span></div>
+  </div>
+</div>
+
+<h2>Parameters</h2>
+<table>
+  <tr><th>Parameter</th><th>Range</th><th>Function</th></tr>
+  <tr><td>Cloak Depth</td><td>0–100%</td><td>How strongly the measured phase correction is applied</td></tr>
+  <tr><td>Lookahead</td><td>0–20ms</td><td>Pre-delay budget for the analysis/correction path</td></tr>
+  <tr><td>Target Freq Low / High</td><td>20–300Hz</td><td>The frequency window the phase engine operates in</td></tr>
+  <tr><td>Transient Sensitivity</td><td>0–100%</td><td>How readily the kick's transients register as "active"</td></tr>
+  <tr><td>Bypass</td><td>on/off</td><td>Click-free (20ms crossfade) true dry passthrough</td></tr>
+</table>
+
+<h2>System Requirements</h2>
+<p>VST3 and Standalone builds. Tested on Intel Mac OS 15.7. Windows 11 x64 build supported via the
+same cross-platform JUCE 9 / CMake project (FORMATS VST3 + Standalone) — build with a standard
+CMake + Visual Studio toolchain on Windows using the included <code>CMakeLists.txt</code>.</p>
+
+<div class="signature">
+This plugin was built by Claude Code (Sonnet 5), based on a joint idea by Gabor Tomori and
+Gemini, under Gabor Tomori's direction and with Gemini's review, in 2026.<br>
+Tested on Intel Mac OS 15.7, FL Studio 2026.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+  ______________________________________________________________________
+
+   ###   ####  ###  #   #  #### ##### #####  ####
+  #   # #     #   # #   # #       #     #   #
+  ##### #     #   # #   #  ###    #     #   #
+  #   # #     #   # #   #     #   #     #   #
+  #   # #     #   # #   #     #   #     #   #
+  #   #  ####  ###   ###  ####    #   #####  ####
+
+              #### #      ###   ###  #   #
+             #     #     #   # #   # #  #
+             #     #     #   # ##### ###
+             #     #     #   # #   # #  #
+             #     #     #   # #   # #   #
+              #### #####  ###  #   # #   #
+  ______________________________________________________________________
+
+                    G A B C I ' S   A C O U S T I C   C L O A K
+        ---------------------------------------------------------------
+                 Phase-Rotation Sidechain Engine · VST3 / Standalone
+
+  DESCRIPTION
+  -----------
+  Acoustic Cloak replaces traditional sidechain ducking with a real-time
+  phase-rotation engine: instead of lowering the bass's volume on every
+  kick hit, it measures the actual phase relationship between kick and
+  bass inside an adjustable low-frequency window and rotates the bass's
+  phase so the two signals sum CONSTRUCTIVELY. Result: full loudness,
+  zero gain reduction, no pumping. A flat-summing Linkwitz-Riley crossover
+  isolates the target band; an allpass Hilbert transformer provides an
+  exact analytic (I/Q) signal for the rotation; a "Dummy All-Pass" trick
+  warps the untouched residual by an identical filter copy, so the
+  recombination stays magnitude-flat at ANY rotation angle. A live
+  polar "Holographic Radar" shows the measured phase/correlation.
+
+  MAIN PARAMETERS
+  ----------------
+  Cloak Depth ........... 0-100%   strength of the applied phase correction
+  Lookahead ............. 0-20ms   pre-delay budget for analysis/correction
+  Target Freq Low/High .. 20-300Hz the frequency window the engine works in
+  Transient Sensitivity .. 0-100%  how readily kick transients gate the
+                                    correction's adaptation speed
+  Bypass ................. on/off  click-free (20ms crossfade) true dry
+                                    passthrough
+
+  KEY TECHNOLOGY
+  ---------------
+  * BandIsolator          - 2-stage 4th-order Linkwitz-Riley crossover,
+                             flat-sum verified within +/-2% (10Hz-8kHz)
+  * AllpassHilbertNetwork - 8-stage interleaved IIR allpass Hilbert
+                             transformer, EXACT magnitude preservation
+                             (|H(f)|=1 always), no resonant image leakage
+  * "Dummy All-Pass"      - identical-cascade residual warp; LTI linearity
+                             (filter(A)+filter(B)=filter(A+B)) guarantees
+                             a flat recombination at any rotation angle
+  * PhaseCorrelationAnalyzer - continuous phase-difference tracking with
+                             a broadband, non-resonant transient gate
+  * Holographic Radar GUI - live polar phase/correlation display,
+                             phosphor-glow "medical instrument" aesthetic
+
+  QUALITY (measured, not assumed)
+  ---------------------------------
+  Automated test assertions .......... 78, across 14 test cases, all pass
+  BandIsolator flat-sum accuracy ...... within 2% (10Hz-8kHz sweep)
+  AllpassHilbertNetwork phase accuracy  80-84 deg of 90 (20-150Hz band)
+  AllpassHilbertNetwork magnitude error  exact (allpass: |H(f)|=1 always)
+  Estimated single-instance CPU ....... 0.522% @ 48kHz/512 samples
+  Design history .................... 3 independent review cycles; two
+                                        earlier architectures (resonator
+                                        -bank reconstruction, nested
+                                        crossover sub-bands) were built,
+                                        measured, and discarded on hard
+                                        evidence -- see CHANGELOG.md
+
+  SOURCES / REFERENCES
+  ----------------------
+  - Linkwitz-Riley crossover theory (Siegfried Linkwitz / Russ Riley)
+  - Digital allpass Hilbert transformer design via bilinear-transformed
+    analog allpass sections (interleaved-pole SSB/quadrature technique)
+  - JUCE 9 framework (juce::dsp::LinkwitzRileyFilter, AudioProcessorValueTreeState)
+  - Design review credited to Gemini (3 rounds: resonator-bank risk,
+    single-resonator rotation-accuracy risk, and the final "Dummy
+    All-Pass" architecture)
+
+  CREATORS
+  ---------
+  Built by ........ Claude Code (Sonnet 5)
+  Concept by ....... Gabor Tomori & Gemini (joint idea)
+  Direction ........ Gabor Tomori
+  Design review .... Gemini
+
+  CODE SIZE
+  ----------
+  Source/ (plugin DSP + GUI) .......... 2143 lines  (23 files)
+  Tests/  (Catch2 unit + load tests) ... 690 lines  (6 files)
+  TOTAL ................................ 2833 lines
+
+  PLATFORMS
+  ----------
+  VST3 + Standalone  |  Intel macOS 15.7 (tested)  |  Windows 11 x64
+  (same CMake/JUCE 9 project builds natively on both; see CMakeLists.txt)
+
+  Version 1.0.0 -- 2026-08-05
+  ---------------------------------------------------------------

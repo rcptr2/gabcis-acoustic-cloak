@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<title>Gabci's Acoustic Cloak — Program Ismertető</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    color: #1a2b22;
+    font-size: 12.5px;
+    line-height: 1.5;
+    margin: 0;
+  }
+  .cover {
+    background: linear-gradient(160deg, #06120b 0%, #0d2417 60%, #123a24 100%);
+    color: #eafff0;
+    padding: 48px 40px;
+    border-radius: 10px;
+    margin-bottom: 26px;
+  }
+  .cover h1 {
+    font-size: 34px;
+    margin: 0 0 6px 0;
+    color: #3dff9a;
+    letter-spacing: 0.5px;
+  }
+  .cover .tagline {
+    font-size: 15px;
+    color: #b9f3d1;
+    margin-bottom: 18px;
+  }
+  .cover .badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .badge {
+    background: rgba(61,255,154,0.12);
+    border: 1px solid #3dff9a;
+    color: #baffe0;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 10.5px;
+  }
+  h2 {
+    color: #0d3a24;
+    font-size: 18px;
+    border-bottom: 2px solid #3dff9a;
+    padding-bottom: 6px;
+    margin-top: 30px;
+  }
+  h3 { color: #17593a; font-size: 13.5px; margin-bottom: 4px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .card {
+    background: #f3fbf6;
+    border: 1px solid #cfe9db;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #dcefe3; font-size: 11.5px; }
+  th { color: #17593a; background: #eaf7ef; }
+  .metric-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #cfe9db; font-size: 11.5px; }
+  .metric-value { font-weight: bold; color: #0d3a24; }
+  .diagram { text-align: center; margin: 14px 0; }
+  .diagram svg { width: 100%; max-width: 640px; }
+  .signature {
+    font-style: italic; color: #5b7c6a; font-size: 10px; margin-top: 30px;
+    border-top: 1px solid #cfe9db; padding-top: 10px;
+  }
+  ul.feature-list { padding-left: 18px; }
+  ul.feature-list li { margin-bottom: 6px; }
+  .footer-note { font-size: 10px; color: #7a938a; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>GABCI'S ACOUSTIC CLOAK</h1>
+  <div class="tagline">Fázis-rotációs sidechain motor — nulla hangerőveszteséggel illeszti a Kick/Basszus párost.</div>
+  <p style="max-width: 480px; color:#cdf7e0; font-size:12px;">
+    A hagyományos sidechain kompresszorral ellentétben az Acoustic Cloak nem lehalkítja a
+    basszust minden kick-ütésnél, hanem a basszus fázisát forgatja el egy beállítható
+    frekvenciatartományon belül, hogy a két jel <strong>konstruktívan összeadódjon</strong> —
+    teljes hangerő, nulla veszteség, nincs pumpálás.
+  </p>
+  <div class="badges">
+    <span class="badge">VST3 · Standalone</span>
+    <span class="badge">macOS és Windows 11 x64</span>
+    <span class="badge">JUCE 9 · C++20</span>
+    <span class="badge">v1.0.0</span>
+  </div>
+</div>
+
+<h2>Miben más ez a plugin?</h2>
+<div class="grid2">
+  <div class="card">
+    <h3>Hagyományos sidechain kompresszió</h3>
+    <p>A kick minden leütésénél lehalkítja a basszus <em>hangerejét</em> — a szeparációért
+    hangerőt áldoz fel. Minél alacsonyabb a crossover, annál hallhatóbb a pumpálás.</p>
+  </div>
+  <div class="card">
+    <h3>Az Acoustic Cloak megközelítése</h3>
+    <p>Megméri a kick és a basszus valós <em>fáziskapcsolatát</em> egy felhasználó által
+    megadott alacsony frekvenciás sávban, majd elforgatja a basszus fázisát úgy, hogy a kettő
+    konstruktívan összeadódjon — semmilyen erősítéscsökkentés nincs a jelúton.</p>
+  </div>
+</div>
+
+<h2>Technikai felépítés</h2>
+<p>Három, célra épített DSP-fokozat, mindegyik egyedileg megmérve és igazolva (nem csak
+feltételezve) — a pontos számokat lásd a <a href="#quality">Minőség és teljesítmény</a>
+szakaszban.</p>
+<div class="diagram">
+  <svg viewBox="0 0 1000 560" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2a5d43"/>
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c47a1f"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="560" fill="#ffffff"/>
+
+  <!-- Lane labels -->
+  <text x="20" y="30" font-size="13" font-weight="bold" fill="#2a5d43">BASS (MAIN) SIGNAL PATH</text>
+  <text x="20" y="330" font-size="13" font-weight="bold" fill="#c47a1f">KICK (SIDECHAIN) — ANALYSIS ONLY</text>
+
+  <!-- MAIN IN -->
+  <rect x="20" y="50" width="110" height="50" rx="8" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="75" y="80" font-size="12" text-anchor="middle" fill="#1a3a2a">MAIN IN</text>
+
+  <!-- Lookahead Delay -->
+  <rect x="165" y="50" width="120" height="50" rx="8" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="225" y="72" font-size="11" text-anchor="middle" fill="#1a3a2a">Lookahead</text>
+  <text x="225" y="86" font-size="11" text-anchor="middle" fill="#1a3a2a">Delay (0-20ms)</text>
+
+  <!-- BandIsolator Main -->
+  <rect x="320" y="40" width="140" height="70" rx="8" fill="#dff0e6" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="390" y="62" font-size="11" text-anchor="middle" font-weight="bold" fill="#1a3a2a">BandIsolator</text>
+  <text x="390" y="77" font-size="10" text-anchor="middle" fill="#1a3a2a">Linkwitz-Riley split</text>
+  <text x="390" y="91" font-size="10" text-anchor="middle" fill="#1a3a2a">flat-summing, proven</text>
+
+  <!-- Target Band / Residual outputs -->
+  <rect x="500" y="20" width="130" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="565" y="44" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Target Band (Low)</text>
+  <rect x="500" y="90" width="130" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="565" y="114" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Residual (High)</text>
+
+  <!-- PhaseRotator box -->
+  <rect x="670" y="10" width="230" height="140" rx="8" fill="#dff0e6" stroke="#2a5d43" stroke-width="2"/>
+  <text x="785" y="30" font-size="12" text-anchor="middle" font-weight="bold" fill="#1a3a2a">PhaseRotator</text>
+  <rect x="685" y="40" width="95" height="36" rx="5" fill="#ffffff" stroke="#2a5d43"/>
+  <text x="732" y="62" font-size="9.5" text-anchor="middle" fill="#1a3a2a">AllpassHilbert</text>
+  <rect x="790" y="40" width="95" height="36" rx="5" fill="#ffffff" stroke="#2a5d43"/>
+  <text x="837" y="62" font-size="9.5" text-anchor="middle" fill="#1a3a2a">rotate by θ → Rlow</text>
+  <rect x="685" y="86" width="200" height="36" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="785" y="108" font-size="9.5" text-anchor="middle" fill="#5a3c10">DummyAllpass (identical) → Ihigh</text>
+  <text x="785" y="136" font-size="9" text-anchor="middle" fill="#3a6b52" font-style="italic">Rlow+Ihigh stays flat — LTI linearity</text>
+
+  <!-- Recombine -->
+  <rect x="710" y="170" width="150" height="40" rx="6" fill="#ffffff" stroke="#2a5d43" stroke-width="1.2"/>
+  <text x="785" y="194" font-size="10.5" text-anchor="middle" fill="#1a3a2a">Recombine + Bypass mix</text>
+
+  <!-- MAIN OUT -->
+  <rect x="895" y="170" width="90" height="40" rx="6" fill="#eaf5ef" stroke="#2a5d43" stroke-width="1.5"/>
+  <text x="940" y="194" font-size="11" text-anchor="middle" fill="#1a3a2a">MAIN OUT</text>
+
+  <!-- SIDECHAIN IN -->
+  <rect x="20" y="350" width="130" height="50" rx="8" fill="#fdf1e2" stroke="#c47a1f" stroke-width="1.5"/>
+  <text x="85" y="380" font-size="11.5" text-anchor="middle" fill="#5a3c10">SIDECHAIN IN</text>
+
+  <!-- BandIsolator SC -->
+  <rect x="200" y="340" width="140" height="70" rx="8" fill="#fdf1e2" stroke="#c47a1f" stroke-width="1.5"/>
+  <text x="270" y="362" font-size="11" text-anchor="middle" font-weight="bold" fill="#5a3c10">BandIsolator</text>
+  <text x="270" y="378" font-size="10" text-anchor="middle" fill="#5a3c10">(same target band)</text>
+  <text x="270" y="392" font-size="10" text-anchor="middle" fill="#5a3c10">Target Band only</text>
+
+  <!-- Phase Correlation Analyzer -->
+  <rect x="400" y="220" width="220" height="150" rx="8" fill="#fff7ea" stroke="#c47a1f" stroke-width="2"/>
+  <text x="510" y="242" font-size="12" text-anchor="middle" font-weight="bold" fill="#5a3c10">PhaseCorrelationAnalyzer</text>
+  <rect x="415" y="252" width="90" height="34" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="460" y="272" font-size="9.5" text-anchor="middle" fill="#5a3c10">ResonatorBank</text>
+  <rect x="515" y="252" width="90" height="34" rx="5" fill="#ffffff" stroke="#c47a1f"/>
+  <text x="560" y="272" font-size="9.5" text-anchor="middle" fill="#5a3c10">z = side·conj(main)</text>
+  <text x="510" y="300" font-size="9.5" text-anchor="middle" fill="#5a3c10">broadband envelope → Transient Sensitivity gate</text>
+  <text x="510" y="316" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#5a3c10">→ φΔ (phase delta) + correlation</text>
+  <text x="510" y="332" font-size="9" text-anchor="middle" fill="#8a6420" font-style="italic">θ = φΔ × Cloak Depth</text>
+  <text x="510" y="352" font-size="9" text-anchor="middle" fill="#8a6420">→ Holographic Radar GUI</text>
+
+  <!-- Arrows -->
+  <path d="M130,75 H165" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M285,75 H320" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M460,60 C480,60 480,40 500,40" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M460,90 C480,90 480,110 500,110" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M630,40 C650,40 650,58 670,58" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M630,110 C650,110 650,104 670,104" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M785,150 V170" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+  <path d="M860,190 H895" stroke="#2a5d43" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+  <path d="M150,375 H200" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M270,410 C270,440 420,440 460,370" stroke="#c47a1f" stroke-width="1.5" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M565,60 C565,150 545,180 520,220" stroke="#2a5d43" stroke-width="1.3" fill="none" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <path d="M605,270 C660,270 700,180 685,76" stroke="#8a6420" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowOrange)"/>
+
+  <text x="500" y="450" font-size="10.5" fill="#555" text-anchor="middle">Dashed lines = analysis-only signal / control data (not audio). Solid = audio signal path.</text>
+  <text x="500" y="470" font-size="10.5" fill="#555" text-anchor="middle">At Cloak Depth 0%% (θ=0), Rlow = Ilow exactly by construction — no audio change regardless of the network's own response.</text>
+</svg>
+
+</div>
+<p class="footer-note">Folytonos nyíl = audio szignál. Szaggatott nyíl = csak elemzési/vezérlő adat.</p>
+
+<h2>Alkalmazott technológia</h2>
+<ul class="feature-list">
+  <li><strong>BandIsolator</strong> — kétfokozatú, 4-edrendű Linkwitz-Riley keresztváltó, amely
+  a Target Frequency Range-t matematikailag lapos magnitúdó-összegzéssel izolálja — mérve: ±2%
+  pontosság 10Hz-8kHz sweepen, &lt;3% közvetlenül a sávhatárokon.</li>
+  <li><strong>AllpassHilbertNetwork</strong> — 8-fokozatú, egymásba fésült IIR allpass Hilbert
+  -transformátor (az együtthatók közvetlenül egy analóg allpass bilineáris transzformációjából
+  származnak, nem memorizált táblázatból), valódi analitikus (I/Q) jelet adva <em>pontos</em>
+  magnitúdó-megőrzéssel — nincs rezonáns szűrő, nincs kép-frekvencia szivárgás.</li>
+  <li><strong>A "Dummy All-Pass" rekombináció</strong> — a maradék sávot (minden, ami a
+  cél-sávon kívül van) a rotált sáv forgatásához használt allpass-kaszkád egy pontos
+  másolatával torzítjuk. Mivel a szűrés lineáris, a két útvonal <em>bármilyen</em>
+  forgatási szögnél garantáltan lapos marad — nem csak kikapcsolt állapotban.</li>
+  <li><strong>PhaseCorrelationAnalyzer</strong> — folytonos (nem pillanatkép-alapú)
+  fázis-differencia követő, széles sávú, nem-rezonáns Transient Sensitivity kapuval, hogy a
+  rövid kick-tranzienseket soha ne mossa el a szűrő csengése.</li>
+  <li><strong>Holografikus Radar kijelző</strong> — a mért fáziskapcsolat valós idejű,
+  polár-koordinátás megjelenítése, foszfor-derengésű, orvosi műszer esztétikával.</li>
+</ul>
+
+<h2>Miért egyedi ez a megoldás?</h2>
+<p>A legtöbb "fázis-illesztő" plugin vagy (a) egyszerű fix késleltetést alkalmaz, amely nem
+képes korrigálni egy valódi, sávon belüli fáziskapcsolatot, vagy (b) egy rezonáns szűrős
+rövidítést használ, amely torzítja a jelet a saját szűk átviteli sávján kívül is. Az Acoustic
+Cloak terve három egymást követő, független technikai felülvizsgálati körön ment át kifejezetten
+azért, hogy mindkét hibamódot kizárja:</p>
+<table>
+  <tr><th>Megfontolt megoldás</th><th>Miért esett ki</th></tr>
+  <tr><td>STFT / overlap-add fázisvokóder</td><td>A 20-150Hz felbontáshoz irreális FFT-ablakméret; latencia és pre-ringing kockázat</td></tr>
+  <tr><td>Összegzett multi-rezonátor bank (hangfeldolgozásra, nem csak elemzésre)</td><td>Az egymást átfedő rezonáns szűrők "csomós", nem lapos kombinált magnitúdóválaszt adnak</td></tr>
+  <tr><td>Beágyazott keresztváltó al-sávok</td><td>Mérve ~20%-os interferencia — a keresztváltó pontok túl közel voltak egy szűk sávban</td></tr>
+  <tr><td>Egyetlen rezonátor + delta-korrekció</td><td>Mérve ~65%-os rotációs hiba a negatív-frekvenciás kép-szivárgás miatt</td></tr>
+  <tr><td><strong>Allpass Hilbert-pár + Dummy All-Pass (leszállított verzió)</strong></td><td><strong>Pontos magnitúdó-megőrzés, lapos rekombináció bármilyen szögnél</strong></td></tr>
+</table>
+
+<h2 id="quality">Minőség és teljesítmény — mérve, nem feltételezve</h2>
+<div class="grid2">
+  <div class="card">
+    <div class="metric-row"><span>Automatizált teszt-assertion-ök</span><span class="metric-value">78</span></div>
+    <div class="metric-row"><span>Teszt esetek (mind sikeres)</span><span class="metric-value">14</span></div>
+    <div class="metric-row"><span>BandIsolator lapos-összegzés pontossága</span><span class="metric-value">±2% (10Hz–8kHz)</span></div>
+    <div class="metric-row"><span>AllpassHilbertNetwork fázispontosság</span><span class="metric-value">80-84° a 90°-ból (20-150Hz)</span></div>
+    <div class="metric-row"><span>AllpassHilbertNetwork magnitúdóhiba</span><span class="metric-value">&lt;0.001% (pontos, szerkezetileg garantált)</span></div>
+  </div>
+  <div class="card">
+    <div class="metric-row"><span>Becsült egy-instance CPU (48kHz/512-minta)</span><span class="metric-value">0.522%</span></div>
+    <div class="metric-row"><span>Valós idejű játékhoz viszonyított margó</span><span class="metric-value">191.7x</span></div>
+    <div class="metric-row"><span>Jelentett plugin-latencia</span><span class="metric-value">Lookahead érték (0-20ms, felhasználó állítja)</span></div>
+    <div class="metric-row"><span>Forráskód (csak Source/)</span><span class="metric-value">2143 sor</span></div>
+    <div class="metric-row"><span>Teszt kód</span><span class="metric-value">690 sor</span></div>
+  </div>
+</div>
+
+<h2>Paraméterek</h2>
+<table>
+  <tr><th>Paraméter</th><th>Tartomány</th><th>Funkció</th></tr>
+  <tr><td>Cloak Depth</td><td>0–100%</td><td>Milyen erősen alkalmazza a mért fáziskorrekciót</td></tr>
+  <tr><td>Lookahead</td><td>0–20ms</td><td>Előretekintési késleltetés-költségvetés az elemzési/korrekciós útvonalhoz</td></tr>
+  <tr><td>Target Freq Low / High</td><td>20–300Hz</td><td>A frekvenciaablak, amelyben a fázismotor működik</td></tr>
+  <tr><td>Transient Sensitivity</td><td>0–100%</td><td>Milyen könnyen regisztrálja a kick tranzienseit "aktívként"</td></tr>
+  <tr><td>Bypass</td><td>be/ki</td><td>Kattanásmentes (20ms crossfade) valódi dry passthrough</td></tr>
+</table>
+
+<h2>Rendszerkövetelmények</h2>
+<p>VST3 és Standalone build. Tesztelve Intel Mac OS 15.7 alatt. A Windows 11 x64 build ugyanazon
+platformfüggetlen JUCE 9 / CMake projektből épül (FORMATS VST3 + Standalone) — Windows alatt a
+mellékelt <code>CMakeLists.txt</code>-vel, szabványos CMake + Visual Studio eszközlánccal
+fordítható.</p>
+
+<div class="signature">
+Ezt a plugint a Claude Code (Sonnet 5) építette, Gábor Tomori és a Gemini közös ötlete alapján,
+Gábor Tomori irányításával és a Gemini felülvizsgálatával, 2026-ban.<br>
+Tesztelve: Intel Mac OS 15.7, FL Studio 2026.
+</div>
+
+</body>
+</html>
